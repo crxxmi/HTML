@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>บัญชีรายรับ-รายจ่าย</title>
+<style>
+body{font-family:Arial;max-width:700px;margin:30px auto}
+input,select,button{padding:8px;margin:5px}
+li{margin:8px 0;padding:8px;background:#eee}
+</style>
+</head>
+
+<body>
+
+<h1>บัญชีรายรับ-รายจ่าย</h1>
+
+<select id="type">
+<option value="income">รายรับ</option>
+<option value="expense">รายจ่าย</option>
+</select>
+
+<input id="name" placeholder="ชื่อรายการ">
+
+<select id="category">
+<option>อาหาร</option>
+<option>เดินทาง</option>
+<option>ช้อปปิ้ง</option>
+<option>เงินเดือน</option>
+<option>อื่นๆ</option>
+</select>
+
+<input id="amount" type="number" placeholder="จำนวนเงิน">
+
+<button onclick="add()">เพิ่มรายการ</button>
+
+<br>
+
+<input id="search" placeholder="🔎 ค้นหารายการ" oninput="show()">
+
+<h3>สรุปการเงิน</h3>
+<p>รายรับรวม: ฿<span id="income">0.00</span></p>
+<p>รายจ่ายรวม: ฿<span id="expense">0.00</span></p>
+<p>คงเหลือ: ฿<span id="balance">0.00</span></p>
+
+<h3>ประวัติรายการ</h3>
+<ul id="list"></ul>
+
+<button onclick="clearAll()">ล้างข้อมูลทั้งหมด</button>
+
+<script>
+let data = [];
+
+function add(){
+let t = document.getElementById("type").value;
+let n = document.getElementById("name").value;
+let c = document.getElementById("category").value;
+let a = Number(document.getElementById("amount").value);
+
+if(n == "" || a <= 0){
+alert("กรอกข้อมูลให้ครบ");
+return;
+}
+
+data.push({
+type:t,
+name:n,
+category:c,
+amount:a
+});
+
+document.getElementById("name").value = "";
+document.getElementById("amount").value = "";
+
+show();
+}
+
+function show(){
+let list = document.getElementById("list");
+let search = document.getElementById("search").value.toLowerCase();
+
+list.innerHTML = "";
+
+data.filter(x => x.name.toLowerCase().includes(search))
+.forEach((x,i) => {
+list.innerHTML += `
+<li>
+${i+1} | ${x.type == "income" ? "รายรับ" : "รายจ่าย"}
+| ${x.name} | ${x.category} | ฿${x.amount}
+</li>`;
+});
+
+let inc = 0;
+let exp = 0;
+
+data.forEach(x => {
+if(x.type == "income") inc += x.amount;
+else exp += x.amount;
+});
+
+document.getElementById("income").innerText = inc.toFixed(1);
+document.getElementById("expense").innerText = exp.toFixed(1);
+document.getElementById("balance").innerText = (inc-exp).toFixed(1);
+}
+
+function clearAll(){
+if(confirm("ต้องการล้างข้อมูลทั้งหมดหรือไม่?")){
+data = [];
+show();
+}
+}
+
+show();
+</script>
